@@ -4,296 +4,831 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>AS HOST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600;700&family=Helvetica+Neue:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      background: #000;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --gray-100: #f5f5f7;
+      --gray-200: #e5e5ea;
+      --gray-400: #8e8e93;
+      --gray-600: #48484a;
+      --gray-800: #1c1c1e;
+      --radius-xl: 20px;
+      --radius-2xl: 28px;
+      --blur: blur(30px);
     }
 
-    /* ── LOADER ── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #000;
+    }
+
+    /* ── LOADING SCREEN ── */
     #loader {
       position: fixed;
       inset: 0;
+      z-index: 999;
       background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 28px;
-      z-index: 100;
-      transition: opacity 0.5s ease;
-    }
-    #loader.hide { opacity: 0; pointer-events: none; }
-
-    .l-title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: #636366;
+      gap: 36px;
     }
 
-    .l-ring {
-      width: 56px;
-      height: 56px;
-      border: 1.5px solid #2c2c2e;
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.85s linear infinite;
-    }
-
-    .l-dots {
-      display: flex;
-      gap: 7px;
-    }
-    .l-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #3a3a3c;
-      animation: dotpulse 1.4s ease-in-out infinite;
-    }
-    .l-dot:nth-child(1) { animation-delay: 0s; }
-    .l-dot:nth-child(2) { animation-delay: 0.2s; }
-    .l-dot:nth-child(3) { animation-delay: 0.4s; }
-
-    /* ── MAIN ── */
-    #app {
+    .loader-logo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 32px;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      padding: 32px;
-      text-align: center;
+      gap: 10px;
+      animation: loaderFadeIn 0.6s ease forwards;
     }
-    #app.visible { opacity: 1; }
 
-    .brand {
+    .loader-icon {
+      width: 72px;
+      height: 72px;
+      background: #fff;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 60px rgba(255,255,255,0.15);
+    }
+
+    .loader-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .loader-wordmark {
       font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.4em;
+      letter-spacing: 0.3em;
+      color: #fff;
       text-transform: uppercase;
-      color: #636366;
     }
 
-    .avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 22px;
-      background: #1c1c1e;
-      border: 0.5px solid #3a3a3c;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .avatar svg { width: 36px; height: 36px; }
-
-    .name {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-    .sub {
-      font-size: 14px;
-      color: #636366;
-      margin-top: 4px;
+    /* iOS style spinner ring */
+    .ios-spinner {
+      width: 28px;
+      height: 28px;
+      position: relative;
+      animation: loaderFadeIn 0.8s ease 0.3s both;
     }
 
-    .btn {
+    .ios-spinner span {
+      position: absolute;
+      width: 3px;
+      height: 7px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      left: 50%;
+      transform-origin: center 14px;
+    }
+
+    .ios-spinner span:nth-child(1)  { transform: rotate(0deg)   translateX(-50%); animation: tick 1s linear 0.000s infinite; }
+    .ios-spinner span:nth-child(2)  { transform: rotate(30deg)  translateX(-50%); animation: tick 1s linear 0.083s infinite; }
+    .ios-spinner span:nth-child(3)  { transform: rotate(60deg)  translateX(-50%); animation: tick 1s linear 0.166s infinite; }
+    .ios-spinner span:nth-child(4)  { transform: rotate(90deg)  translateX(-50%); animation: tick 1s linear 0.250s infinite; }
+    .ios-spinner span:nth-child(5)  { transform: rotate(120deg) translateX(-50%); animation: tick 1s linear 0.333s infinite; }
+    .ios-spinner span:nth-child(6)  { transform: rotate(150deg) translateX(-50%); animation: tick 1s linear 0.416s infinite; }
+    .ios-spinner span:nth-child(7)  { transform: rotate(180deg) translateX(-50%); animation: tick 1s linear 0.500s infinite; }
+    .ios-spinner span:nth-child(8)  { transform: rotate(210deg) translateX(-50%); animation: tick 1s linear 0.583s infinite; }
+    .ios-spinner span:nth-child(9)  { transform: rotate(240deg) translateX(-50%); animation: tick 1s linear 0.666s infinite; }
+    .ios-spinner span:nth-child(10) { transform: rotate(270deg) translateX(-50%); animation: tick 1s linear 0.750s infinite; }
+    .ios-spinner span:nth-child(11) { transform: rotate(300deg) translateX(-50%); animation: tick 1s linear 0.833s infinite; }
+    .ios-spinner span:nth-child(12) { transform: rotate(330deg) translateX(-50%); animation: tick 1s linear 0.916s infinite; }
+
+    @keyframes tick {
+      0%   { background: rgba(255,255,255,1); }
+      100% { background: rgba(255,255,255,0.12); }
+    }
+
+    /* Progress bar */
+    .loader-progress {
+      width: 120px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      animation: loaderFadeIn 0.8s ease 0.5s both;
+    }
+
+    .loader-progress-fill {
+      height: 100%;
       background: #fff;
-      color: #000;
-      font-size: 15px;
-      font-weight: 600;
-      padding: 15px 48px;
-      border-radius: 14px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: transform 0.12s ease, opacity 0.12s ease;
-      letter-spacing: -0.01em;
+      border-radius: 2px;
+      width: 0%;
+      animation: progressFill 2s cubic-bezier(0.4,0,0.2,1) 0.6s forwards;
     }
-    .btn:active { transform: scale(0.95); opacity: 0.8; }
-    .btn svg { width: 16px; height: 16px; }
 
-    /* ── MODAL ── */
-    #modal {
+    @keyframes progressFill {
+      0%   { width: 0%; }
+      60%  { width: 75%; }
+      85%  { width: 90%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes loaderFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loader exit */
+    #loader.hide {
+      animation: loaderOut 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+
+    @keyframes loaderOut {
+      to { opacity: 0; transform: scale(1.03); pointer-events: none; }
+    }
+
+    /* ── MAIN PAGE ── */
+    #app {
       position: fixed;
       inset: 0;
       background: #000;
-      z-index: 200;
-      display: none;
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.7s ease;
     }
-    #modal.open { display: flex; }
 
-    .modal-top {
+    #app.visible {
+      opacity: 1;
+    }
+
+    /* Ambient background blobs */
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-blob-1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,0.04);
+      top: -100px;
+      left: -80px;
+      animation: blobFloat 8s ease-in-out infinite;
+    }
+
+    .bg-blob-2 {
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.03);
+      bottom: 50px;
+      right: -60px;
+      animation: blobFloat 10s ease-in-out 2s infinite reverse;
+    }
+
+    @keyframes blobFloat {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50%      { transform: translate(20px, 30px) scale(1.05); }
+    }
+
+    /* Status bar */
+    .status-bar {
+      width: 100%;
+      max-width: 430px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 18px 12px;
-      border-bottom: 0.5px solid #2c2c2e;
-      flex-shrink: 0;
+      padding: 14px 20px 0;
+      z-index: 10;
+      position: relative;
     }
-    .modal-top-title {
+
+    .status-time {
       font-size: 15px;
       font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-    .close-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #2c2c2e;
-      border: none;
       color: #fff;
-      font-size: 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-icons svg {
+      fill: #fff;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 34px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 11;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      max-width: 430px;
+      padding: 20px 24px 0;
+      z-index: 10;
+      position: relative;
+      animation: slideDown 0.7s cubic-bezier(0.4,0,0.2,1) 0.1s both;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(255,255,255,0.15);
+    }
+
+    .brand-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      width: 100%;
+      max-width: 430px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px;
+      gap: 32px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      animation: fadeUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-orb {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+
+    .hero-orb-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff 0%, #888 60%, #222 100%);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.15),
+        0 0 40px rgba(255,255,255,0.08),
+        0 20px 60px rgba(0,0,0,0.6);
+      animation: orbPulse 4s ease-in-out infinite;
+      position: relative;
+    }
+
+    .hero-orb-ring {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: ringExpand 3s ease-in-out infinite;
+    }
+
+    .hero-orb-ring2 {
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.04);
+      animation: ringExpand 3s ease-in-out 0.5s infinite;
+    }
+
+    @keyframes orbPulse {
+      0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 0 40px rgba(255,255,255,0.08), 0 20px 60px rgba(0,0,0,0.6); }
+      50%      { box-shadow: 0 0 0 1px rgba(255,255,255,0.2),  0 0 60px rgba(255,255,255,0.12), 0 20px 60px rgba(0,0,0,0.6); }
+    }
+
+    @keyframes ringExpand {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.04); }
+    }
+
+    /* Online dot on orb */
+    .hero-orb-status {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 16px;
+      height: 16px;
+      background: #30d158;
+      border-radius: 50%;
+      border: 2.5px solid #000;
+      z-index: 2;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span {
+      color: var(--gray-400);
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--gray-400);
+      line-height: 1.5;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      animation: fadeUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.35s both;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* CTA */
+    .cta-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.5s both;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 17px 24px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .close-btn:active { background: #3a3a3c; }
-
-    .modal-frame-wrap {
-      flex: 1;
+      gap: 10px;
       position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 4px 24px rgba(255,255,255,0.15);
+      text-decoration: none;
     }
-    .modal-frame-wrap iframe {
-      width: 100%; height: 100%; border: none;
-    }
-    .frame-loader {
+
+    .btn-primary::before {
+      content: '';
       position: absolute;
       inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(255,255,255,0.2); }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:active { transform: scale(0.97); box-shadow: none; }
+
+    .btn-primary-icon {
+      width: 24px;
+      height: 24px;
       background: #000;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.3s ease;
-    }
-    .frame-loader.hidden { opacity: 0; pointer-events: none; }
-    .frame-loader-ring {
-      width: 36px;
-      height: 36px;
-      border: 1.5px solid #2c2c2e;
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    .modal-bottom {
-      padding: 10px 18px 32px;
-      display: flex;
-      justify-content: center;
-      border-top: 0.5px solid #2c2c2e;
       flex-shrink: 0;
     }
-    .home-pill {
-      width: 134px;
-      height: 5px;
-      background: #fff;
-      border-radius: 3px;
-      opacity: 0.25;
+
+    .btn-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.15);
+      transform: scale(0);
+      animation: ripple 0.5s linear;
+      pointer-events: none;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes dotpulse {
-      0%, 100% { background: #3a3a3c; transform: scale(1); }
-      50% { background: #fff; transform: scale(1.4); }
+    @keyframes ripple {
+      to { transform: scale(4); opacity: 0; }
     }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 15px 24px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:active { transform: scale(0.97); background: rgba(255,255,255,0.1); }
+
+    /* Bottom */
+    .footer {
+      width: 100%;
+      max-width: 430px;
+      padding: 0 24px 34px;
+      z-index: 10;
+      text-align: center;
+      animation: fadeUp 0.8s ease 0.6s both;
+    }
+
+    .footer-line {
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: var(--gray-600);
+      letter-spacing: 0.05em;
+    }
+
+    /* iOS sheet overlay when clicked */
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      backdrop-filter: blur(4px);
+    }
+
+    .sheet-overlay.show { opacity: 1; pointer-events: all; }
+
+    .sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1c1c1e;
+      border-radius: 24px 24px 0 0;
+      padding: 12px 24px 48px;
+      z-index: 201;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .sheet.show { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .sheet-sub {
+      font-size: 14px;
+      color: var(--gray-400);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .sheet-btn {
+      width: 100%;
+      padding: 16px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+
+    .sheet-btn:active { opacity: 0.85; }
+
+    .sheet-cancel {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: opacity 0.2s;
+    }
+
+    .sheet-cancel:active { opacity: 0.7; }
   </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="l-title">AS HOST</div>
-  <div class="l-ring"></div>
-  <div class="l-dots">
-    <div class="l-dot"></div>
-    <div class="l-dot"></div>
-    <div class="l-dot"></div>
-  </div>
-</div>
-
-<!-- MAIN -->
-<div id="app">
-  <div class="brand">AS HOST</div>
-  <div class="avatar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-  </div>
-  <div>
-    <div class="name">Open Chat</div>
-    <div class="sub">Tap below to start</div>
-  </div>
-  <button class="btn" id="openBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-    Start Chat
-  </button>
-</div>
-
-<!-- MODAL -->
-<div id="modal">
-  <div class="modal-top">
-    <button class="close-btn" id="closeBtn">✕</button>
-    <span class="modal-top-title">AS HOST</span>
-    <div style="width:30px;"></div>
-  </div>
-  <div class="modal-frame-wrap">
-    <div class="frame-loader" id="frameLoader">
-      <div class="frame-loader-ring"></div>
+  <!-- LOADING SCREEN -->
+  <div id="loader">
+    <div class="loader-logo">
+      <div class="loader-icon">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="16" r="7" fill="#000"/>
+          <path d="M6 34c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#000" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="loader-wordmark">AS HOST</div>
     </div>
-    <iframe id="chatFrame" src="" title="Chat"></iframe>
+    <div class="ios-spinner">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="loader-progress">
+      <div class="loader-progress-fill"></div>
+    </div>
   </div>
-  <div class="modal-bottom">
-    <div class="home-pill"></div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+    <div class="dynamic-island"></div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-time" id="clock">9:41</div>
+      <div class="status-icons">
+        <!-- Signal -->
+        <svg width="17" height="12" viewBox="0 0 17 12">
+          <rect x="0" y="7" width="3" height="5" rx="0.8" opacity="1"/>
+          <rect x="4.5" y="4.5" width="3" height="7.5" rx="0.8" opacity="1"/>
+          <rect x="9" y="2" width="3" height="10" rx="0.8" opacity="1"/>
+          <rect x="13.5" y="0" width="3" height="12" rx="0.8" opacity="0.3"/>
+        </svg>
+        <!-- WiFi -->
+        <svg width="16" height="12" viewBox="0 0 16 12">
+          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#fff"/>
+          <path d="M3.2 6.5A6.7 6.7 0 0 1 8 4.5a6.7 6.7 0 0 1 4.8 2" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M.5 3.5A10.6 10.6 0 0 1 8 .5a10.6 10.6 0 0 1 7.5 3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="25" height="12" viewBox="0 0 25 12">
+          <rect x="0" y="1" width="21" height="10" rx="2.5" stroke="#fff" stroke-width="1" fill="none" opacity="0.35"/>
+          <rect x="1" y="2" width="17" height="8" rx="1.5" fill="#fff"/>
+          <path d="M22.5 4v4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="brand-row">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="9" r="4.5" fill="#000"/>
+            <path d="M3 21c0-4.97 4.03-9 9-9s9 4.03 9 9" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">AS HOST</div>
+          <div class="brand-sub">Live Chat Platform</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-orb">
+          <div class="hero-orb-ring2"></div>
+          <div class="hero-orb-ring"></div>
+          <div class="hero-orb-inner"></div>
+          <div class="hero-orb-status"></div>
+        </div>
+        <div class="hero-title">Welcome to<br/><span>AS HOST</span> Chat</div>
+        <div class="hero-desc">Connect instantly with your host. Fast, private, and always online.</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val">24/7</div>
+          <div class="stat-lbl">Available</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:#30d158;">Online</div>
+          <div class="stat-lbl">Status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">Fast</div>
+          <div class="stat-lbl">Response</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-group">
+        <button class="btn-primary" id="openChatBtn" onclick="openSheet()">
+          <div class="btn-primary-icon">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M6.5 1a5.5 5.5 0 0 1 4.33 8.86L11.5 12l-2.24-.68A5.5 5.5 0 1 1 6.5 1z" fill="#fff"/>
+            </svg>
+          </div>
+          Open Chat
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-left:auto;">
+            <path d="M6 4l4 4-4 4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="#8e8e93" stroke-width="1.5"/>
+            <path d="M8 5v3.5l2 2" stroke="#8e8e93" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span style="color:var(--gray-400); font-size:14px;">Chat History</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-line"></div>
+      <div class="footer-text">AS HOST · Powered by iOS Interface</div>
+    </div>
   </div>
-</div>
 
-<script>
-  const CHAT_URL = 'https://ios-chat-22498-449ae8d02f02.herokuapp.com/';
+  <!-- Sheet overlay -->
+  <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Open Chat</div>
+    <div class="sheet-sub">You'll be connected to the AS HOST chat interface. Tap continue to proceed.</div>
+    <button class="sheet-btn" onclick="goToChat()">Continue to Chat →</button>
+    <button class="sheet-cancel" onclick="closeSheet()">Cancel</button>
+  </div>
 
-  setTimeout(() => {
-    document.getElementById('loader').classList.add('hide');
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('app').classList.add('visible');
-    }, 500);
-  }, 2000);
+  <script>
+    // Live clock
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours(), m = now.getMinutes();
+      document.getElementById('clock').textContent =
+        h + ':' + String(m).padStart(2, '0');
+    }
+    updateClock();
+    setInterval(updateClock, 30000);
 
-  const modal = document.getElementById('modal');
-  const frame = document.getElementById('chatFrame');
-  const frameLoader = document.getElementById('frameLoader');
+    // Loader → app
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('loader');
+        const app    = document.getElementById('app');
+        loader.classList.add('hide');
+        app.classList.add('visible');
+        setTimeout(() => loader.remove(), 700);
+      }, 2800);
+    });
 
-  document.getElementById('openBtn').addEventListener('click', () => {
-    modal.classList.add('open');
-    if (!frame.src || frame.src === 'about:blank') frame.src = CHAT_URL;
-  });
+    // Ripple on primary btn
+    document.getElementById('openChatBtn').addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      ripple.className = 'btn-ripple';
+      ripple.style.cssText =
+        `width:60px;height:60px;left:${e.clientX - rect.left - 30}px;top:${e.clientY - rect.top - 30}px`;
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
 
-  frame.addEventListener('load', () => {
-    setTimeout(() => frameLoader.classList.add('hidden'), 300);
-  });
+    function openSheet() {
+      document.getElementById('overlay').classList.add('show');
+      document.getElementById('sheet').classList.add('show');
+    }
 
-  document.getElementById('closeBtn').addEventListener('click', () => {
-    modal.classList.remove('open');
-  });
-</script>
+    function closeSheet() {
+      document.getElementById('overlay').classList.remove('show');
+      document.getElementById('sheet').classList.remove('show');
+    }
+
+    function goToChat() {
+      window.location.href = 'https://ios-chat-22498-449ae8d02f02.herokuapp.com/';
+    }
+  </script>
 </body>
 </html>
+
